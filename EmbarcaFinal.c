@@ -60,8 +60,9 @@ volatile _Atomic uint desce_um=0;
 int randon=0;
 static bool randonTwo=0;
 float vardbA=0.0f;
-float vardbC=0.0f;
+float _Atomic vardbC=0.0f;
 mutex_t mutexDecibeis;
+float vardbATratado=0.0f;
 #define SUAVIZACAO 0.1f;
 //objetivo nao muito claro
 static volatile uint32_t ultimo_pressionamento = 0;
@@ -206,14 +207,28 @@ void subRotinaDois()
         uint16_t valorADC=adc_read();
         valorDBA=converteDBA(valorDBA, valorADC);
         float valorDBC =converteDBC(valorADC);
-        
+        float mediaDBA=0;
+        int contado=0;
+        for (int i=0; i<600; i++)
+        {
+            mediaDBA=mediaDBA+valorDBA;
+            contador++;
+            //mutex_enter_blocking(&mutexDecibeis);
+            vardbC=valorDBC;
+            //mutex_exit(&mutexDecibeis);
+            sleep_ms(100);
+        }
         mutex_enter_blocking(&mutexDecibeis);
-        valordbA=valorDBA;
-        valordbC=valorDBC;
+        vardbATratado=mediaDBA/contador;
         mutex_exit(&mutexDecibeis);
-        sleep_ms(50);
+
     }
 }
+    bool repetir_exibicao_tela(struct repeating_timer *t)
+    {
+        //fução que a cada 150ms pega os valores de dba e dbc e envia para tela
+        //e atualiza indice risco
+    } 
 int main()
 {
     stdio_init_all();
@@ -223,15 +238,27 @@ int main()
     gpio_set_irq_enabled_with_callback(BOTAO_C, GPIO_IRQ_EDGE_FALL, true, &tratar_botoes);
     boas_vindas(&ssd);
     sleep_ms(5000);
-
+    struct repeating_timer time;
 
     //inicia mutex
     mutex_init(&mutexDecibeis);
     multicore_launch_core1(subRotinaDois);
-    
+    int indicesDBA[116];
+    add_repeating_timer_ms(150, repetir_exibicao_tela, NULL, &timer);
     while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
+        
+        float temp =0.0f;
+        mutex_enter_blocking(&mutexDecibeis);
+        temp=vardbATratado;
+        mutex_exit(&mutexDecibeis);
+        
+        if(temp >=80 &&temp<=115)
+        {
+            indicesDBA[temp]++;
+            //verificar se na mesma faixa de indice o numero é compativel com 
+            //um indice referencia
+            //e se nfor acima enviar sinal para mudar faixa ou iniciar alerta visual
+        }
         if(saida_teste==1)
         {
             desliga_tudo();
