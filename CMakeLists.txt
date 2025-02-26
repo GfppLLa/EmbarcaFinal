@@ -35,28 +35,54 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(EmbarcaFinal EmbarcaFinal.c )
+add_executable(EmbarcaFinal 
+                EmbarcaFinal.c 
+                include/modules/escalaAlerta.c
+                include/modules/font.c
+                include/modules/operacaoPio.c
+                include/modules/referencia.c
+                include/modules/ssd1306.c
+                )
 
 pico_set_program_name(EmbarcaFinal "EmbarcaFinal")
 pico_set_program_version(EmbarcaFinal "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
+pico_generate_pio_header(EmbarcaFinal ${CMAKE_CURRENT_LIST_DIR}/pio_matrix.pio)
+
 pico_enable_stdio_uart(EmbarcaFinal 0)
-pico_enable_stdio_usb(EmbarcaFinal 0)
+pico_enable_stdio_usb(EmbarcaFinal 1)
 
 # Add the standard library to the build
 target_link_libraries(EmbarcaFinal
-        pico_stdlib)
-
+        pico_stdlib
+        pico_stdlib          # funções padrão do pico
+        hardware_adc         # biblioteca para o uso do adc
+        hardware_pwm         # controle do pwm
+        hardware_flash       # manipulação da memória flash
+        hardware_clocks      # controle dos clocks do pico
+        hardware_pio         # controle das máquinas de estado pio
+        hardware_structs     # acesso às structs de hardware
+        pico_multicore       # suporte para uso dos dois núcleos
+        pico_time            # manipulação de tempo e delays
+        pico_rand            # geração de números aleatórios
+        hardware_i2c
+        )
+target_sources(EmbarcaFinal PRIVATE
+                include/modules/operacaoPio.c
+                include/modules/font.c
+                include/modules/referencia.c
+                include/modules/ssd1306.c
+)   
 # Add the standard include files to the build
 target_include_directories(EmbarcaFinal PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_LIST_DIR}/include/libraries
+        ${CMAKE_CURRENT_LIST_DIR}/include/modules
 )
-
+link_directories(${CMAKE_CURRENT_LIST_DIR}/include/libraries)
 # Add any user requested libraries
-target_link_libraries(EmbarcaFinal 
-        
-        )
+
 
 pico_add_extra_outputs(EmbarcaFinal)
 

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
-
+#include <stdio.h>
 #define WIDTH 128
 #define HEIGHT 64
 
@@ -52,7 +52,7 @@ uint8_t ssd1306_draw_char(ssd1306_t *ssd, char c, uint8_t x, uint8_t y);
 void ssd1306_draw_string(ssd1306_t *ssd, const char *str, uint8_t *x_, uint8_t *y_);
 void boas_vindas(ssd1306_t *ssd);
 void mensagem_bootloader(ssd1306_t *ssd);
-
+void leituradbs(ssd1306_t *ssd, float dba, float dbc);
 
 
 #endif // SSD1306_H

@@ -199,17 +199,45 @@ void boas_vindas(ssd1306_t *ssd)
 {
   ssd1306_fill(ssd,false); //Limpa display
   ssd1306_rect(ssd,3,3,122,58,true,false); //Desenha retângulo
-  ssd1306_draw_string(ssd,"   gleison",4,25); 
-  ssd1306_draw_string(ssd,"   embarcatech",4,45);
+  uint8_t posX = 4;
+  uint8_t posY = 25;
+  ssd1306_draw_string(ssd,"   gleison",&posX, &posY); 
+  posX = 4;
+  posY = 45;
+  ssd1306_draw_string(ssd,"   embarcatech",&posX, &posY);
 
   ssd1306_send_data(ssd); //Atualiza o display
+}
+void leituradbs(ssd1306_t *ssd, float dba, float dbc)
+{
+  char buffer[16]; // buffer para conversão de float para string
+
+  ssd1306_fill(ssd, false); // limpa o display
+  ssd1306_rect(ssd, 3, 3, 122, 58, true, false); // desenha o retângulo
+  uint8_t posX = 4;
+  uint8_t posY = 10;
+  ssd1306_draw_string(ssd, "   Leitura", &posX, &posY); 
+    posX = 4;
+    posY = 30;
+  snprintf(buffer, sizeof(buffer), "   %.1f dBA", dba);
+  ssd1306_draw_string(ssd, buffer, &posX, &posY); // valor de dBA exibido corretamente
+  posX = 4;
+  posY = 50;
+  snprintf(buffer, sizeof(buffer), "   %.1f dBC", dbc);
+  ssd1306_draw_string(ssd, buffer, &posX, &posY); // valor de dBC exibido corretamente
+  
+  ssd1306_send_data(ssd); // atualiza o display
 }
 void mensagem_bootloader(ssd1306_t *ssd)
 {
     ssd1306_fill(ssd,false); //Limpa display
     sleep_ms(500);
     ssd1306_rect(ssd,3,3,122,58,true,false); //Desenha retângulo
-    ssd1306_draw_string(ssd,"   PICO",4,25); 
-    ssd1306_draw_string(ssd,"   BOOTLOADER",4,45);
+    uint8_t posX = 4;
+    uint8_t posY = 25;
+    ssd1306_draw_string(ssd,"   PICO",&posX, &posY); 
+        posX = 4;
+        posY = 45;
+    ssd1306_draw_string(ssd,"   BOOTLOADER",&posX, &posY);
     ssd1306_send_data(ssd); //Atualiza o display
 }

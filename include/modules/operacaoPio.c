@@ -50,14 +50,14 @@ void atualiza_matrix()//atualiza o matrix
 {
  uint32_t valor_led = 0;
 
-    tocar_tom_buzzer(1000, 200); 
+    //tocar_tom_buzzer(1000, 200); 
     sleep_ms(20);              
 
  
         for (int16_t i = 0; i < NUM_PIXELS; i++) //laço pixels ou colnas
         {
 
-            valor_led = matrix_rgbFlag(numbers[numero_display][24-i]);
+            valor_led = matrix_rgbFlag(escala[numero_display][24-i]);//mudar aqui
           
             pio_sm_put_blocking(pio_controlador, state_machine, valor_led);
             sleep_us(50);
@@ -68,50 +68,30 @@ void atualiza_matrix()//atualiza o matrix
     
 }
 uint32_t matrix_rgbFlag(double number)//atualiza valor das cores
-{
-     // Certifica-se de que 'number' esteja no intervalo [0, 1]
+    {   // Certifica-se de que 'number' esteja no intervalo [0, 1]
     number = fmax(0.0, fmin(1.0, number));
-    double brilhoLeds=0;
-    if(var_teste==1){
-         brilhoLeds=1;
-         randon=4;
-    }else{
-     brilhoLeds=0.25*brilho;
-        randon=(rand()%4)+1;
-
-    }
-
-
-    // Definir as variáveis de cor RGB
-    unsigned char R = 0, G = 0, B = 0;
-if(randon>=1&&randon<=3){
-    // Ajuste de cor baseado na variável 'cor_atual'
-    if (randon == 1) { // Vermelho
-        R = (unsigned char)(number *brilhoLeds* 255.0); // R é o máximo, G e B são 0
-    } else if (randon == 2) { // Verde
-        G = (unsigned char)(number *brilhoLeds*  255.0); // G é o máximo, R e B são 0
-    } else if (randon == 3) { // Azul
-        B = (unsigned char)(number *brilhoLeds*  255.0); // B é o máximo, R e G são 0
-    }
-}else if(randon==4)//se or and for 4 o led fica branco
-{
-        R = (unsigned char)(number *brilhoLeds* 255.0); // R é o máximo, G e B são 0
-        G = (unsigned char)(number *brilhoLeds*  255.0); // G é o máximo, R e B são 0
-        B = (unsigned char)(number *brilhoLeds*  255.0); // B é o máximo, R e G são 0
     
-}
-if( randonTwo==true)//se or and for 4 o led fica branco
-{
-        R = (unsigned char)(number *brilhoLeds* 255.0); // R é o máximo, G e B são 0
-        G = (unsigned char)(number *brilhoLeds*  255.0); // G é o máximo, R e B são 0
-        B = (unsigned char)(number *brilhoLeds*  255.0); // B é o máximo, R e G são 0
+    // Define o fator de brilho: se var_teste == 1, brilho máximo; senão, escala com 'brilho'
+    double brilhoLeds = (var_teste == 1) ? 1.0 : 0.25 * brilho;
+    double factor = number * brilhoLeds;
     
-}
-randon=0;
-    // Retorna o valor RGB no formato ARGB (Alpha, Red, Green, Blue)
-    return (G << 24) | (R << 16) | (B << 8) | 0xFF;
-}
-void operacaoDoPio()
-{
-    //recebe como parametro um numero e exibe um alerta em tela referente
+    // Define a cor base.
+    // Usamos o padrão dado: 0xff028200 (ARGB: alfa=0xff, red=0x02, green=0x82, blue=0x00)
+    // Se var_teste ou randonTwo forem verdadeiros, pode ser definido para branco (0xffffffff)
+    uint32_t baseColor = 0xff028200;
+   
+    
+    // Extrai os canais de cor do baseColor (no formato ARGB: 0xAA RR GG BB)
+    unsigned char A = (baseColor >> 24) & 0xFF;
+    unsigned char R = (baseColor >> 16) & 0xFF;
+    unsigned char G = (baseColor >> 8)  & 0xFF;
+    unsigned char B = baseColor & 0xFF;
+    
+    // Ajusta o brilho de cada canal multiplicando pelo fator (garante que não ultrapasse 255)
+    R = (unsigned char) fmin(255, R * factor);
+    G = (unsigned char) fmin(255, G * factor);
+    B = (unsigned char) fmin(255, B * factor);
+    
+    // Retorna o valor ARGB no formato 0xAARRGGBB (alpha fixo em 0xFF)
+    return (0xFF << 24) | (R << 16) | (G << 8) | B;
 }

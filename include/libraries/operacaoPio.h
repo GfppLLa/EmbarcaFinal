@@ -13,6 +13,7 @@
 #include "hardware/flash.h"
 #include "hardware/structs/systick.h" 
 #include "pio_matrix.pio.h"
+#include "include/libraries/escalaAlerta.h"
 //#include "numbers_n_array.h"
 #include <time.h>
 #include <stdlib.h>
@@ -30,41 +31,42 @@
 #define NUM_PIXELS 25
 #define DEBOUNCING_TIME_US 220
 //
-void tocar_tom_buzzer(uint16_t frequency, uint32_t duration_ms);
+//void tocar_tom_buzzer(uint16_t frequency, uint32_t duration_ms);
 void tratar_botoes(uint gpio, uint32_t eventos);
 void acende_led();
 void apaga_led();
 uint32_t matrix_rgbFlag(double number);
 void debounce();
-void inicia_hardware();
+
 void entrarModoBootloaderDois();
 void init_pio_routine(void);
 void desliga_tudo();
 void ligar_todos_os_leds();
+void atualiza_matrix();
 
 //
 
 //variaveis universais
 //variaveis pio
-PIO pio_controlador = pio0;
-bool status_init_pio = false;
-uint state_machine =0;
+// variáveis pio
+extern PIO pio_controlador;
+extern bool status_init_pio;
+extern uint state_machine;
 
-//variaveis operação
-volatile _Atomic uint numero_display=0;
-volatile _Atomic uint cor_atual =1;//apenas 1, 2 e 3 
-volatile _Atomic uint brilho =1; // 1 a 4
-volatile _Atomic uint tempo =5; // 1 a 4
-volatile uint32_t hora_presente;
-volatile _Atomic uint var_teste=0;
-volatile _Atomic uint saida_teste=0;
-volatile _Atomic uint sobe_um=0;
-volatile _Atomic uint desce_um=0;
-int randon=0;
-static bool randonTwo=0;
+// variáveis operação
+extern volatile _Atomic uint numero_display;
+extern volatile _Atomic uint cor_atual;
+extern volatile _Atomic uint brilho;
+extern volatile _Atomic uint tempo;
+extern volatile uint32_t hora_presente;
+extern volatile _Atomic uint var_teste;
+extern volatile _Atomic uint saida_teste;
+extern volatile _Atomic uint sobe_um;
+extern volatile _Atomic uint desce_um;
+extern int randon;
 
-//objetivo nao muito claro
-static volatile uint32_t ultimo_pressionamento = 0;
+extern volatile uint32_t ultimo_pressionamento;
+
 
 
 #endif

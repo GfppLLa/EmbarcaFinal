@@ -38,6 +38,9 @@
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
         "*.embeddedhtml": "html",
-        "ssd1306.h": "c"
+        "ssd1306.h": "c",
+        "referencia.h": "c",
+        "operacaopio.h": "c",
+        "escalaalerta.h": "c"
     }
 }
